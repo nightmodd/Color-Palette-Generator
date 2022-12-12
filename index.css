@@ -174,7 +174,7 @@ img {
 }
 
 .page_button p span {
-  color: rgba(19, 0, 238, 0.4);
+  color: rgba(19, 0, 238, 0.78);
   transition: all 0.2s ease-in-out;
   cursor: pointer;
 }
