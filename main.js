@@ -1,199 +1,195 @@
+// CONSTANTS
+const MAX_HEX_VALUE = parseInt("FFFFFF", 16);
+const TEMP_COLOR = {
+  code: "000",
+  locked: false,
+};
+
 const hexacodes = document.querySelectorAll(".hexacode");
 const generateButton = document.querySelector(".generate_button");
 const ul = document.querySelector("#display-colors");
+const deleteButton = document.getElementById("delete_button");
 const html = String.raw;
 
-let colorsState = [
-  {
-    code: "#000",
+
+// UTILITIES
+function generateHexCode() {
+  const letters = "0123456789ABCDEF";
+  let color = "";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+
+  //return Math.floor(Math.random() * MAX_HEX_VALUE).toString(16);
+}
+
+function initColorState(colorsNumber) {
+  colorsState = new Array(colorsNumber).fill(null).map(() => ({
+    code: generateHexCode(),
     locked: false,
-  },
-  {
-    code: "#000",
-    locked: false,
-  },
-  {
-    code: "#000",
-    locked: false,
-  },
-  {
-    code: "#000",
-    locked: false,
-  },
-  {
-    code: "#000",
-    locked: false,
-  },
-];
+  }));
+}
 
-// let blockedColorRGB = [];
-// let fetchedColorsRGB = [];
+function deleteFromColorState(deletedIndex) {
+  const tempState = colorsState.filter((_, index) => {
+    return deletedIndex !== index;
+  });
 
-// /**
-//  * @param {MouseEvent} ev
-//  */
-// function lockColor(ev) {
-//   // ev.currentTarget.classList.toggle("lock--closed");
+  colorsState = tempState;
+}
 
-//   const { index } = ev.currentTarget.dataset;
-//   const numberIndex = Number(index);
-//   colorsState[numberIndex].locked = !colorsState[numberIndex].locked;
+function renderOnTransitionEnd() {
+  render(colorsState);
+}
 
-//   if (colorsState[numberIndex].locked) {
-//      let colorObj = {
-//        color: fetchedColorsRGB[numberIndex],
-//        index: numberIndex,
-//      };
-//      blockedColorRGB.push(colorObj);
-//   } else {
-//     //bug doesnot delete after remove lock
-//     blockedColorRGB.splice(numberIndex, 1);
-//   }
 
-//   render(colorsState);
-// }
-// function createRequestFilter() {
-//   let obj = [];
-//   for (let i = 0; i < 5; i++) {
-//     if (blockedColorIndex.includes(i)) {
-//       blockedColorRGB.forEach((colorObj) => {
-//         if (colorObj.index === i) {
-//           obj.push(colorObj.color);
-//         }
-//       });
-//     } else {
-//       obj.push("N");
-//     }
-//   }
-//   return obj;
-// }
+// CORE/LIB
+let colorsState = [];
 
+async function swalAlertOnReload() {
+  const { value } = await Swal.fire({
+    title: "Welcome",
+    input: "number",
+    inputPlaceholder: "Select a number of colors",
+    confirmButtonText: "Generate",
+    inputValidator: (value) => {
+      if (!value || Number(value) < 1) {
+        return "You need to choose a positive value!";
+      }
+    },
+  });
+
+  const colorsNumber = Number(value);
+
+  swal
+    .fire({
+      title: `Are you sure you want to generate ${colorsNumber} colors?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+    })
+    .then((result) => {
+      if (result.isConfirmed) {
+        initColorState(colorsNumber);
+        loadColors();
+      } else {
+        swalAlertOnReload();
+      }
+    });
+}
+
+function generateRandomColors() {
+  return colorsState.map((color) => {
+    if (color.locked) {
+      return color;
+    } else {
+      return {
+        code: generateHexCode(),
+        locked: false,
+      };
+    }
+  });
+}
+
+function Colour(color, index) {
+  const { code, locked } = color;
+
+  return html`
+    <li class="item1" ontransitionend="renderOnTransitionEnd()">
+      <div class="container">
+        <button
+          title="copy colour"
+          onclick="copyHexcode(this)"
+          data-color="#${code}"
+        >
+          <div class="color" style="background:#${code}"></div>
+        </button>
+        <button
+          title="copy colour"
+          class="hexacode"
+          onclick="copyHexcode(this)"
+          data-color="#${code}"
+        >
+          <p class="color_hexcode">#${code}</p>
+        </button>
+      </div>
+      <div class="function_buttons">
+        <button
+          title="lock colour"
+          class="lock ${locked ? "lock--closed" : ""}"
+          data-index="${index}"
+          onclick="lockColor(event)"
+        >
+          <img src="open-lock.svg" role="presentation" />
+          <img src="closed-lock.svg" role="presentation" />
+        </button>
+
+        <button
+          title="delete colour"
+          data-index="${index}"
+          id="delete_button"
+          onclick="deleteColor(event)"
+        >
+          <img src="delete-icon.svg" role="presentation" />
+        </button>
+      </div>
+    </li>
+  `;
+}
+
+function ColourList(colors) {
+  const renderedColors = colors
+    .map((color, index) => {
+      return Colour(color, index);
+    })
+    .join("");
+
+  const extraButton = html`<li>
+    <button
+      class="extra_color"
+      title="add extra color"
+      onclick="addExtraColor()"
+    >
+      <img src="add.svg" alt="add icon" />
+    </button>
+  </li>`;
+
+  return html`${renderedColors} ${extraButton} `;
+}
+
+function render(colors) {
+  ul.innerHTML = ColourList(colors);
+}
+
+const loadColors = async () => {
+  const newColors = generateRandomColors();
+  colorsState = newColors;
+  render(colorsState);
+};
+
+// function  for buttons on colors
 /**
  * @param {MouseEvent} ev
  */
 function lockColor(ev) {
   const { index } = ev.currentTarget.dataset;
   colorsState[index].locked = !colorsState[index].locked;
-
   render(colorsState);
 }
 
-/**
- * @param {string} code
- */
-function mapHexToRGB(code) {
-  const [, red, blue, green] = code.match(
-    /([0-9a-z]{2})([0-9a-f]{2})([0-9a-z]{2})/i
-  );
+function deleteColor(ev) {
+  const index = Number(ev.currentTarget.dataset.index);
+  const li = ev.currentTarget.closest("li");
 
-  return [parseInt(red, 16), parseInt(blue, 16), parseInt(green, 16)];
+  li.classList.add("removed");
+
+  deleteFromColorState(index);
 }
-
-// Maps colorState -> [rgb, rgb, N, N, N]
-function createRequestFilter() {
-  return colorsState.map((color) => {
-    if (color.locked) return mapHexToRGB(color.code);
-    else return "N";
-  });
-}
-
-// function to map colors array to hex array only and "N" -> []
-const fetchColors = async () => {
-  try {
-    const object = createRequestFilter();
-    const response = await fetch("http://colormind.io/api/", {
-      method: "POST",
-      mode: "cors",
-      body: JSON.stringify({
-        input: object,
-        model: "default",
-      }),
-    });
-
-    if (!response.ok) throw Error("Can't get the response");
-    const data = await response.json();
-
-    return data.result;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-function mapColorResponseToState(fetchedColors) {
-  fetchedColorsRGB = fetchedColors;
-
-  let colorCodes = fetchedColors.map((colors) => {
-    let colorsPaletteCodes = colors
-      .map((specificColor) => {
-        return specificColor.toString(16).padStart(2, "0");
-      })
-      .join("");
-
-    return colorsPaletteCodes;
-  });
-
-  const newState = colorCodes.map((code, index) => ({
-    code, // colors[index].locked? colors[index].code: code
-    locked: colorsState[index] ? colorsState[index].locked : false,
-  }));
-
-  return newState;
-}
-function render(colors) {
-  const renderedColors = colors
-    .map((color, index) => {
-      const { code, locked } = color;
-
-      return html`
-        <li class="item1">
-          <div class="container">
-            <button
-              title="copy colour"
-              onclick="copyHexcode(this)"
-              data-color="#${code}"
-            >
-              <div class="color" style="background:#${code}"></div>
-            </button>
-            <button
-              title="copy colour"
-              class="hexacode"
-              onclick="copyHexcode(this)"
-              data-color="#${code}"
-            >
-              <p class="color_hexcode">#${code}</p>
-            </button>
-          </div>
-
-          <button
-            title="lock colour"
-            class="lock ${locked ? "lock--closed" : ""}"
-            data-index="${index}"
-            onclick="lockColor(event)"
-          >
-            <img src="open-lock.svg" role="presentation" class="active_img" />
-            <img src="closed-lock.svg" role="presentation" class="active_img" />
-          </button>
-        </li>
-      `;
-    })
-    .join("");
-
-  ul.innerHTML = renderedColors;
-}
-
-const loadColors = async () => {
-  const fetchedColors = await fetchColors();
-
-  //return colors in hexacodes
-  const newColors = mapColorResponseToState(fetchedColors);
-  colorsState = newColors;
-  render(colorsState);
-};
 
 /**
  * @param {MouseEvent} ev
  */
-
 function copyHexcode(element) {
   const copiedText = element.dataset.color;
 
@@ -207,12 +203,23 @@ function copyHexcode(element) {
   );
 }
 
-document.addEventListener("keyup", (ev) => {
-  if (ev.code === "Space") {
-    loadColors();
-    console.log("Space pressed");
-  }
-});
+function addExtraColor() {
+  colorsState.push({
+    code: generateHexCode(),
+    locked: false,
+  }); // colorsState = [...colorsState, TEMP_COLOR]
+
+  render(colorsState);
+}
+
+// EVENTS
+window.addEventListener("load", loadColors);
+window.addEventListener("load", swalAlertOnReload);
 
 generateButton.addEventListener("click", loadColors);
-window.addEventListener("load", loadColors);
+
+document.addEventListener("keyup", (ev) => {
+  if (ev.code === "Enter") {
+    loadColors();
+  }
+});
