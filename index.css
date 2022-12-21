@@ -106,10 +106,10 @@ li .function_buttons {
   margin: auto;
 }
 
-.lock {
+li .function_buttons .lock {
   margin-top: 10px;
-  margin-right: 10px;
   position: relative;
+  margin-right: 7px;
 }
 /*switching the lock style icon*/
 .lock :first-child {
@@ -162,8 +162,25 @@ img {
   opacity: 0;
   cursor: pointer;
 }
+
+li .function_buttons #delete_button {
+  margin-top: 10px;
+  position: relative;
+  margin-right: 6px;
+}
+li .function_buttons input[type="color"] {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 40px;
+  overflow: hidden;
+  cursor: pointer;
+ 
+  
+}
+
 ul li .extra_color {
-  margin: auto 20px;  
+  margin: auto 20px;
 }
 ul li .extra_color img {
   width: 110px;

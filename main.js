@@ -8,9 +8,7 @@ const TEMP_COLOR = {
 const hexacodes = document.querySelectorAll(".hexacode");
 const generateButton = document.querySelector(".generate_button");
 const ul = document.querySelector("#display-colors");
-const deleteButton = document.getElementById("delete_button");
 const html = String.raw;
-
 
 // UTILITIES
 function generateHexCode() {
@@ -43,7 +41,6 @@ function renderOnTransitionEnd() {
   render(colorsState);
 }
 
-
 // CORE/LIB
 let colorsState = [];
 
@@ -56,6 +53,10 @@ async function swalAlertOnReload() {
     inputValidator: (value) => {
       if (!value || Number(value) < 1) {
         return "You need to choose a positive value!";
+      }
+      else if(Number(value) > 50)
+      {
+         return "You need to choose a number below 50";
       }
     },
   });
@@ -133,6 +134,17 @@ function Colour(color, index) {
         >
           <img src="delete-icon.svg" role="presentation" />
         </button>
+        
+        
+           <input
+            type="color"
+            value="#${code}"
+            data-index="${index}"
+            oninput="updateToCustomColor(event)"
+            title="update color"
+          />
+           
+       
       </div>
     </li>
   `;
@@ -185,6 +197,21 @@ function deleteColor(ev) {
   li.classList.add("removed");
 
   deleteFromColorState(index);
+}
+function updateToCustomColor(ev) {
+  const updateColor = ev.currentTarget.value;
+  const currentIndex = Number(ev.currentTarget.dataset.index);
+  colorsState = colorsState.map((color, index) => {
+    if (index === currentIndex) {
+      if (updateColor !== color.code) {
+        color.code = updateColor.substr(1);
+        return color;
+      }
+    } else {
+      return color;
+    }
+  });
+  render(colorsState);
 }
 
 /**
