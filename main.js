@@ -196,14 +196,9 @@ function deleteColor(ev) {
 function updateToCustomColor(ev) {
   const updateColor = ev.currentTarget.value;
   const currentIndex = Number(ev.currentTarget.dataset.index);
-  colorsState = colorsState.map((color, index) => {
-    if (index === currentIndex) {
-      if (updateColor !== color.code) {
-        color.code = updateColor.substr(1);
-        return color;
-      }
-    } else {
-      return color;
+  colorsState.forEach((color, index) => {
+    if (index === currentIndex && updateColor !== color.code && color.locked === false) {
+      color.code = updateColor.substr(1);
     }
   });
   render(colorsState);
@@ -217,29 +212,27 @@ function copyHexcode(element) {
 
   navigator.clipboard.writeText(copiedText).then(
     () => {
-      alert("Copied the text: " + copiedText);
+      swal.fire("Copied the color: " + copiedText);
     },
     () => {
-      alert("the text faild to copy ");
+      swal.fire("the text faild to copy ");
     }
   );
 }
 
 function addExtraColor() {
   if (colorsState.length < 50) {
-     colorsState.push({
-       code: generateHexCode(),
-       locked: false,
-     }); // colorsState = [...colorsState, TEMP_COLOR]
+    colorsState.push({
+      code: generateHexCode(),
+      locked: false,
+    }); // colorsState = [...colorsState, TEMP_COLOR]
 
-     render(colorsState);
-  }
-  else{
+    render(colorsState);
+  } else {
     swal.fire(
       "you reached the maximum number of colors, Please delete a color to generate another"
     );
   }
- 
 }
 
 // EVENTS
