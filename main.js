@@ -53,10 +53,8 @@ async function swalAlertOnReload() {
     inputValidator: (value) => {
       if (!value || Number(value) < 1) {
         return "You need to choose a positive value!";
-      }
-      else if(Number(value) > 50)
-      {
-         return "You need to choose a number below 50";
+      } else if (Number(value) > 50) {
+        return "You need to choose a number below 50";
       }
     },
   });
@@ -134,17 +132,14 @@ function Colour(color, index) {
         >
           <img src="delete-icon.svg" role="presentation" />
         </button>
-        
-        
-           <input
-            type="color"
-            value="#${code}"
-            data-index="${index}"
-            oninput="updateToCustomColor(event)"
-            title="update color"
-          />
-           
-       
+
+         <input
+          type="color"
+          value="#${code}"
+          data-index="${index}"
+          oninput="updateToCustomColor(event)"
+          title="update color"
+        />
       </div>
     </li>
   `;
@@ -231,12 +226,20 @@ function copyHexcode(element) {
 }
 
 function addExtraColor() {
-  colorsState.push({
-    code: generateHexCode(),
-    locked: false,
-  }); // colorsState = [...colorsState, TEMP_COLOR]
+  if (colorsState.length < 50) {
+     colorsState.push({
+       code: generateHexCode(),
+       locked: false,
+     }); // colorsState = [...colorsState, TEMP_COLOR]
 
-  render(colorsState);
+     render(colorsState);
+  }
+  else{
+    swal.fire(
+      "you reached the maximum number of colors, Please delete a color to generate another"
+    );
+  }
+ 
 }
 
 // EVENTS
