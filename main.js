@@ -8,7 +8,14 @@ const TEMP_COLOR = {
 const hexacodes = document.querySelectorAll(".hexacode");
 const generateButton = document.querySelector(".generate_button");
 const ul = document.querySelector("#display-colors");
+const ulForNav = document.querySelector("#mobile-view");
+const navBar = document.getElementById("nav");
 const html = String.raw;
+let lastScrollTop = 0;
+
+const fr = " 1fr";
+let grid = "auto-flow /";
+let gridColumnNumber;
 
 // UTILITIES
 function generateHexCode() {
@@ -41,6 +48,51 @@ function renderOnTransitionEnd() {
   render(colorsState);
 }
 
+function hideNavOnScroll() {
+  let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  if (scrollTop > lastScrollTop) {
+    navBar.style.top = "-300px";
+  } else {
+    navBar.style.top = "10px";
+  }
+  lastScrollTop = scrollTop;
+}
+function deleteFromNav() {
+  gridColumnNumber = occurrences(grid, "1fr");
+  if (gridColumnNumber > colorsState.length) {
+    grid = grid.slice(0, -4);
+    ulForNav.style.grid = grid;
+  }
+}
+
+/** Function that count occurrences of a substring in a string;
+ * @param {String} string               The string
+ * @param {String} subString            The sub string to search for
+ * @param {Boolean} [allowOverlapping]  Optional. (Default:false)
+ *
+ * @author Vitim.us https://gist.github.com/victornpb/7736865
+ * @see Unit Test https://jsfiddle.net/Victornpb/5axuh96u/
+ * @see https://stackoverflow.com/a/7924240/938822
+ */
+function occurrences(string, subString, allowOverlapping) {
+  string += "";
+  subString += "";
+  if (subString.length <= 0) return string.length + 1;
+
+  var n = 0,
+    pos = 0,
+    step = allowOverlapping ? 1 : subString.length;
+
+  while (true) {
+    pos = string.indexOf(subString, pos);
+    if (pos >= 0) {
+      ++n;
+      pos += step;
+    } else break;
+  }
+  return n;
+}
+
 // CORE/LIB
 let colorsState = [];
 
@@ -53,8 +105,8 @@ async function swalAlertOnReload() {
     inputValidator: (value) => {
       if (!value || Number(value) < 1) {
         return "You need to choose a positive value!";
-      } else if (Number(value) > 50) {
-        return "You need to choose a number below 50";
+      } else if (Number(value) > 12) {
+        return "You need to choose a number below 13";
       }
     },
   });
@@ -165,8 +217,50 @@ function ColourList(colors) {
   return html`${renderedColors} ${extraButton} `;
 }
 
+function navColors(color, index) {
+  const { code, locked } = color;
+  return html` <li style=" background-color:#${code}">
+    <button
+      title="lock colour"
+      class="lock ${locked ? "lock--closed" : ""}"
+      data-index="${index}"
+      onclick="lockColor(event)"
+    >
+      <img src="open-lock.svg" role="presentation" />
+      <img src="closed-lock.svg" role="presentation" />
+    </button>
+  </li>`;
+}
+
+function navBarList(colors) {
+  const renderedNav = colors
+    .map((color, index) => {
+      return navColors(color, index);
+    })
+    .join("");
+
+  for (let i = 0; i < colorsState.length; i++) {
+    gridColumnNumber = occurrences(grid, "1fr");
+    if (
+      gridColumnNumber < 4 &&
+      gridColumnNumber <= colorsState.length &&
+      i >= gridColumnNumber
+    ) {
+      grid += fr;
+      ulForNav.style.grid = grid;
+    }
+    if (i > 4) {
+      break;
+    }
+  } 
+ 
+
+  return renderedNav;
+}
+
 function render(colors) {
   ul.innerHTML = ColourList(colors);
+  ulForNav.innerHTML = navBarList(colors);
 }
 
 const loadColors = async () => {
@@ -190,17 +284,17 @@ function deleteColor(ev) {
   const li = ev.currentTarget.closest("li");
 
   li.classList.add("removed");
-
   deleteFromColorState(index);
+  deleteFromNav();
 }
+
 function updateToCustomColor(ev) {
   const updateColor = ev.currentTarget.value;
   const currentIndex = Number(ev.currentTarget.dataset.index);
-  colorsState.forEach((color, index) => {
-    if (index === currentIndex && updateColor !== color.code && color.locked === false) {
-      color.code = updateColor.substr(1);
-    }
-  });
+  if (colorsState[currentIndex].locked === false) {
+    colorsState[currentIndex].code = updateColor.substr(1);
+  }
+
   render(colorsState);
 }
 
@@ -221,7 +315,7 @@ function copyHexcode(element) {
 }
 
 function addExtraColor() {
-  if (colorsState.length < 50) {
+  if (colorsState.length < 12) {
     colorsState.push({
       code: generateHexCode(),
       locked: false,
@@ -238,6 +332,7 @@ function addExtraColor() {
 // EVENTS
 window.addEventListener("load", loadColors);
 window.addEventListener("load", swalAlertOnReload);
+window.addEventListener("scroll", hideNavOnScroll);
 
 generateButton.addEventListener("click", loadColors);
 

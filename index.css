@@ -8,10 +8,11 @@ body {
   margin: auto;
   background: #cfd4e6;
 }
+
 .div_title {
   text-align: center;
   justify-content: center;
-  margin-top: 26px;
+  margin-top: 110px;
   margin-bottom: 40px;
 }
 .title {
@@ -24,10 +25,10 @@ body {
   color: #000000;
 }
 
-ul {
+.colors_list ul {
   position: relative;
   width: auto;
-  max-width: 854px;
+  max-width: 1000px;
   text-align: center;
   justify-content: center;
   margin: auto;
@@ -38,7 +39,7 @@ ul {
 }
 
 @media only screen and (max-width: 1050px) and (min-width: 550px) {
-  ul {
+  .colors_list ul {
     grid: auto-flow / 1fr 1fr 1fr;
   }
 }
@@ -48,7 +49,7 @@ ul {
     margin-top: 70px;
     margin-bottom: 60px;
   }
-  ul {
+  .colors_list ul {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
@@ -56,7 +57,7 @@ ul {
   }
 }
 
-li {
+.colors_list ul li {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -175,14 +176,12 @@ li .function_buttons input[type="color"] {
   border-radius: 40px;
   overflow: hidden;
   cursor: pointer;
- 
-  
 }
 
-ul li .extra_color {
+body ul li .extra_color {
   margin: auto 20px;
 }
-ul li .extra_color img {
+body ul li .extra_color img {
   width: 110px;
   height: 110px;
 }
@@ -219,4 +218,36 @@ ul li .extra_color img {
 }
 .page_button p span :hover {
   transform: scale(1.2);
+}
+
+body nav {
+  width: 90%;
+  margin: auto;
+  position: fixed;
+  top: 10px;
+  transition: 0.3s;
+  z-index: 2;
+  border-radius: 30px;
+}
+@media (min-width: 1050px) {
+  nav {
+    display: none;
+  }
+}
+body nav ul {
+  margin: auto;
+  display: grid;
+  grid: auto-flow / 1fr 1fr 1fr 1fr;
+  max-width: 450px;
+ 
+}
+nav ul li {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  
+  border-radius: 10px;
+  
+  
+ 
 }
