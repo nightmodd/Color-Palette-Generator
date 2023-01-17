@@ -1,0 +1,22 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "airbnb", "wesbos"],
+  "overrides": [],
+
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "globals": { "swal": true },
+
+  "rules": {
+    "no-unused-vars": 0,
+    "no-plusplus": 0,
+    "spaced-comment": ["error", "never"],
+    "no-irregular-whitespace":1
+  }
+}

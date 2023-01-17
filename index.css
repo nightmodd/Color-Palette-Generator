@@ -1,5 +1,5 @@
 * {
-  font-family: "Catamaran";
+  font-family: 'Catamaran';
   box-sizing: border-box;
   font-style: normal;
 }
@@ -12,11 +12,11 @@ body {
 .div_title {
   text-align: center;
   justify-content: center;
-  margin-top: 110px;
+  margin-top: 120px;
   margin-bottom: 40px;
 }
 .title {
-  font-family: "Catamaran";
+  font-family: 'Catamaran';
   font-style: normal;
   font-weight: 600;
   font-size: 30px;
@@ -38,25 +38,6 @@ body {
   flex-wrap: wrap;
 }
 
-@media only screen and (max-width: 1050px) and (min-width: 550px) {
-  .colors_list ul {
-    grid: auto-flow / 1fr 1fr 1fr;
-  }
-}
-
-@media only screen and (min-width: 1051px) {
-  .div_title {
-    margin-top: 70px;
-    margin-bottom: 60px;
-  }
-  .colors_list ul {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 20px;
-  }
-}
-
 .colors_list ul li {
   position: relative;
   display: flex;
@@ -65,18 +46,22 @@ body {
   justify-self: center;
   margin-bottom: 30px;
   padding: 0px;
-  max-width: 150px;
+  width: 150px;
   height: 270px;
   background: #ffffff;
   border-radius: 10px;
   transition: opacity 0.5s ease-out;
+}
+.colors_list ul .drag_animation {
+  opacity: 0;
+  background-color: #eaeaea;
 }
 
 .removed {
   opacity: 0;
 }
 
-.container {
+.color_container {
   background-color: #ffffff;
   width: auto;
   height: auto;
@@ -85,7 +70,7 @@ body {
 .color_button {
   padding: 0;
 }
-li .container button {
+li .color_container button {
   border-radius: 10px;
 }
 .color {
@@ -95,7 +80,7 @@ li .container button {
   border-radius: 10px;
 }
 
-li .container button p {
+li .color_container button p {
   font-style: normal;
   font-weight: 500;
   font-size: 22px;
@@ -169,7 +154,7 @@ li .function_buttons #delete_button {
   position: relative;
   margin-right: 6px;
 }
-li .function_buttons input[type="color"] {
+li .function_buttons input[type='color'] {
   width: 30px;
   height: 30px;
 
@@ -227,27 +212,52 @@ body nav {
   top: 10px;
   transition: 0.3s;
   z-index: 2;
-  border-radius: 30px;
 }
-@media (min-width: 1050px) {
-  nav {
-    display: none;
-  }
-}
+
 body nav ul {
   margin: auto;
-  display: grid;
-  grid: auto-flow / 1fr 1fr 1fr 1fr;
-  max-width: 450px;
- 
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 5px;
 }
+
 nav ul li {
   display: flex;
   justify-content: center;
   text-align: center;
-  
+  flex-grow: 1;
   border-radius: 10px;
-  
-  
- 
+  min-width: 75px;
+  max-width: 100%;
+}
+
+@media only screen and (max-width: 1050px) and (min-width: 550px) {
+  .colors_list ul {
+    grid: auto-flow / 1fr 1fr 1fr;
+  }
+  nav ul li {
+    min-width: 100px;
+  }
+}
+@media only screen and (min-width: 800px) {
+  nav ul li {
+    min-width: 140px;
+  }
+}
+
+@media only screen and (min-width: 1051px) {
+  .div_title {
+    margin-top: 70px;
+    margin-bottom: 60px;
+  }
+  .colors_list ul {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 20px;
+  }
+  nav {
+    display: none;
+  }
 }
